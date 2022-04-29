@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<form id="myForm">
+    <input type="file" id="csvFile" accept=".csv"/>
+    <br/>
+    <input type="submit" value="Submit"/>
+
+    <table id="myTable" class="table table-striped"></table>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+<script>
+    const myForm = document.getElementById("myForm");
+    const csvFile = document.getElementById("csvFile");
+    const myTable = document.getElementById("myTable");
+
+    function csvToArray(str, delimiter = ",") {
+        const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+
+        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+
+        const arr = rows.map(function (row) {
+            const values = row.split(delimiter);
+            const el = headers.reduce(function (object, header, index) {
+                object[header] = values[index];
+                return object;
+            }, {});
+            return el;
+        });
+
+        return arr;
+    }
+
+    myForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const input = csvFile.files[0];
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const text = e.target.result;
+            const data = csvToArray(text);
+            createTable(data);
+        };
+
+        reader.readAsText(input);
+    });
+
+    function createTable(data) {
+        console.log(data[0]);
+
+        var tableRow = document.createElement("tr");
+
+        Object.keys(data[0]).forEach(function (key) {
+            console.log('Key : ' + key + ', Value : ' + data[key])
+
+            var tableData = document.createElement("td");
+            tableData.innerText = key;
+
+            tableRow.appendChild(tableData);
+        })
+        myTable.appendChild(tableRow);
+        for(let i=1; i<data.length; i++) {
+            var dataRow = document.createElement("tr");
+
+            Object.keys(data[i]).forEach(function (key) {
+                console.log('Key : ' + key + ', Value : ' + data[i][key])
+
+                var tableData = document.createElement("td");
+                tableData.innerText = data[i][key];
+
+                dataRow.appendChild(tableData);
+            })
+
+            myTable.appendChild(dataRow);
+        }
+    }
+
+
+</script>
+
+</body>
+</html>
+
+
+<!--1. loop on data array-->
+<!--2. get index of each row in array-->
+<!--3. create table row(tr) in table with id equals index-->
+<!--4. add td with information in table row (td)-->
